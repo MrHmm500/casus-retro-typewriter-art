@@ -34,3 +34,5 @@ bS = backSlash \
 sQ = singleQuote '
 and
 nl = NewLine
+
+To run this: php -S localhost:8080 -t [folder name]
