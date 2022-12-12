@@ -1,7 +1,7 @@
 <?php
 $jsonTestCases = file_get_contents('testcases.json');
 $testCases = json_decode($jsonTestCases);
-foreach($testCases as $caseName => $caseData) {
+foreach ($testCases as $caseName => $caseData) {
     echo "-----------------------------------<br />";
     echo $caseName . ' wordt getest<br />';
     echo 'expected output: <br />';
@@ -17,42 +17,41 @@ foreach($testCases as $caseName => $caseData) {
     echo "<br />";
 }
 
-function extractOutputFromInput($input) {
+function extractOutputFromInput(array $input): void {
     $answer = '';
     foreach ($input as $chunk) {
         $repeatingChar = '';
-        $multiplicitiveChar = '';
+        $multiplicativeChar = '';
 
         foreach (str_split($chunk) as $index => $char) {
             if (is_numeric($char)) {
-                $multiplicitiveChar .= $char;
+                $multiplicativeChar .= $char;
             } else {
                 $repeatingChar .= $char;
             }
-            if (($index + 1) == strlen($chunk) && is_numeric($char)) {
-                $repeatingChar = $char;
-                $multiplicitiveChar = substr($multiplicitiveChar, 0, -1);
+
+            if (($index + 1) !== strlen($chunk) || is_numeric($char) === false) {
+                continue;
             }
+
+            $repeatingChar = $char;
+            $multiplicativeChar = substr($multiplicativeChar, 0, -1);
         }
-        for ($i = 0; $i < ($multiplicitiveChar == '' ? 1 : $multiplicitiveChar); $i++) {
-            switch ($repeatingChar) {
-                case 'nl':
-                    $answer .= "<br />";
-                    break;
-                case 'sp':
-                    $answer .= "&nbsp;";
-                    break;
-                case 'bS':
-                    $answer .= "\\";
-                    break;
-                case 'sQ':
-                    $answer .= "'";
-                    break;
-                default:
-                    $answer .= $repeatingChar;
-                    break;
-            }
+        switch ($repeatingChar) {
+            case 'nl':
+                $repeatingChar = "<br />";
+                break;
+            case 'sp':
+                $repeatingChar = "&nbsp;";
+                break;
+            case 'bS':
+                $repeatingChar = "\\";
+                break;
+            case 'sQ':
+                $repeatingChar = "'";
+                break;
         }
+        $answer .= str_repeat($repeatingChar, ($multiplicativeChar === '' ? 1 : (int)$multiplicativeChar));
     }
 
     echo $answer;
